@@ -1,0 +1,30 @@
+{
+  "name": "mikemaniax-ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "ts-node t.ts",
+    "dev": "nodemon index.ts"
+  },
+  "author": "Disezmike",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/dotenv": "^8.2.3",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.3",
+    "dotenv": "^16.4.7",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@line/bot-sdk": "^9.5.0",
+    "@types/axios": "^0.14.4",
+    "axios": "^1.7.9",
+    "express": "^4.21.2",
+    "jimp": "^1.6.0",
+    "qr-scanner": "^1.4.2",
+    "qrcode-reader": "^1.0.4"
+  }
+}
