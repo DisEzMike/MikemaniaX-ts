@@ -12,22 +12,5 @@ router.get('/', (req, res) => {
 	res.json({ text: 'Hello, world!' });
 });
 
-// router.get('/get', async (req, res) => {
-// 	try {
-// 		const connection = await Connect();
-
-// 		let sql = 'SELECT * FROM groups';
-// 		const [results] = await connection.execute(sql, []);
-		
-// 		connection.destroy();
-
-// 		console.log(results);
-
-// 		res.json(results);
-// 	} catch (error) {
-// 		console.error(error);
-// 	}
-// });
-
 router.post('/callback', line.middleware(config), controller.callbackFn);
 export { router };
