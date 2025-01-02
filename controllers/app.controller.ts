@@ -65,7 +65,7 @@ async function handleEvent(events: line.webhook.Event[]) {
 					},
 				});
 				await resp.data.pipe(writer);
-				await delay(2000);
+				await delay(2500);
 				const buffer = fs.readFileSync(path);
 				const image = await Jimp.read(buffer);
 				const qrCodeInstance = new qrCodeReader();
