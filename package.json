@@ -21,6 +21,7 @@
   "dependencies": {
     "@line/bot-sdk": "^9.5.0",
     "@types/axios": "^0.14.4",
+    "@types/node-schedule": "^2.1.7",
     "axios": "^1.7.9",
     "express": "^4.21.2",
     "jimp": "^1.6.0",
