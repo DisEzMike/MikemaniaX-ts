@@ -12,23 +12,25 @@ router.get('/', (req, res) => {
 	res.json({ text: 'Hello, world!' });
 });
 
-router.get('/get', async (req, res) => {
-	try {
-		const connection = await Connect();
+// router.get('/get', async (req, res) => {
+// 	try {
+// 		const connection = await Connect();
 
-		let sql = 'SELECT * FROM groups';
-		const [results] = await connection.execute(sql, []);
+// 		let sql = 'SELECT * FROM groups';
+// 		const [results] = await connection.execute(sql, []);
 		
-		connection.destroy();
+// 		connection.destroy();
 
-		console.log(results);
+// 		console.log(results);
 
-		res.json(results);
-	} catch (error) {
-		console.error(error);
-	}
-});
+// 		res.json(results);
+// 	} catch (error) {
+// 		console.error(error);
+// 	}
+// });
 
 router.post('/callback', line.middleware(config), controller.callbackFn);
+
+router.post('/push', controller.pushMsgFn)
 
 export { router };

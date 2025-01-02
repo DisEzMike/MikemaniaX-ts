@@ -7,6 +7,7 @@ import axios from 'axios';
 
 import dotenv from 'dotenv';
 import { config } from '../utils/config';
+import { Connect } from '../utils/mysql';
 dotenv.config();
 
 const host = process.env.HOST;
@@ -25,13 +26,17 @@ export const callbackFn: RequestHandler = (req, res) => {
 	}
 };
 
+export const pushMsgFn: RequestHandler = (req, res) => {
+	
+}
+
 async function handleEvent(events: line.webhook.Event[]) {
 	const event = events[0];
 	console.log(event);
 
 	if (event.type === 'message') {
 		if (event.message.type === 'text') {
-			try {			
+			try {
 				const text = event.message.text;
 				if (text == 'จ่ายเงิน') {
 					await replyMessage(config.channelAccessToken!, {
@@ -46,10 +51,10 @@ async function handleEvent(events: line.webhook.Event[]) {
 					});
 				}
 			} catch (error) {
-				console.error(error)	
+				console.error(error);
 			}
 		}
-	
+
 		if (event.message.type === 'image') {
 			try {
 				let url = `https://api-data.line.me/v2/bot/message/${event.message.id}/content`;
@@ -100,7 +105,7 @@ async function handleEvent(events: line.webhook.Event[]) {
 					// Handle success slip
 					const slipData = res.data.data;
 					console.log(slipData);
-		
+
 					await replyMessage(config.channelAccessToken!, {
 						replyToken: event.replyToken!,
 						messages: [
@@ -114,7 +119,7 @@ async function handleEvent(events: line.webhook.Event[]) {
 					// Handle invalid slip
 					if (axios.isAxiosError(err)) {
 						const errorData = (err as any).response.data;
-		
+
 						await replyMessage(config.channelAccessToken!, {
 							replyToken: event.replyToken!,
 							messages: [
@@ -124,18 +129,31 @@ async function handleEvent(events: line.webhook.Event[]) {
 								},
 							],
 						});
-		
+
 						return;
 					}
 					console.log(err);
 				}
-			} catch(e) {
+			} catch (e) {
 				console.error(e);
 			}
 		}
 	} else if (event.type === 'follow') {
+		const user = event.source;
 
+		if (!user?.userId) return;
+
+		const conn = await Connect();
+		let sql = 'SELECT * FROM users WHERE user_id=?';
+		let [results, fields] = await conn.execute(sql, [user.userId]);
+
+		results = results as any[]
+
+		if (results.length == 1) return;
+
+		sql = 'INSERT INTO users(user_id) VALUE(?)';
+		[results, fields] = await conn.execute(sql, [user.userId]);
 	}
 
-	return
+	return;
 }
