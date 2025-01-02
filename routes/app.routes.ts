@@ -30,7 +30,4 @@ router.get('/', (req, res) => {
 // });
 
 router.post('/callback', line.middleware(config), controller.callbackFn);
-
-router.post('/push', controller.pushMsgFn)
-
 export { router };

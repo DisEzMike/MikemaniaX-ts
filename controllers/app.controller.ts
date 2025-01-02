@@ -26,10 +26,6 @@ export const callbackFn: RequestHandler = (req, res) => {
 	}
 };
 
-export const pushMsgFn: RequestHandler = (req, res) => {
-	
-}
-
 async function handleEvent(events: line.webhook.Event[]) {
 	const event = events[0];
 	console.log(event);
