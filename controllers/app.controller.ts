@@ -1,11 +1,12 @@
 import { RequestHandler } from 'express';
 import * as line from '@line/bot-sdk';
-import { config, replyMessage } from '../utils/line';
+import { replyMessage } from '../utils/line';
 import fs from 'fs';
 import { Jimp } from 'jimp';
 import axios from 'axios';
 
 import dotenv from 'dotenv';
+import { config } from '../utils/config';
 dotenv.config();
 
 const host = process.env.HOST;
