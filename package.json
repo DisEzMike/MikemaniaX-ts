@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "ts-node t.ts",
-    "dev": "nodemon index.ts"
+    "dev": "nodemon index.ts",
+    "build": "tsc",
+    "start-dev" : "node ./build index.js",
+    "start": "node index.js"
   },
   "author": "Disezmike",
   "license": "MIT",
