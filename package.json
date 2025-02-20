@@ -7,7 +7,7 @@
     "test": "ts-node t.ts",
     "dev": "nodemon index.ts",
     "build": "tsc",
-    "start": "node ./build/index.js"
+    "start": "node ./index.js"
   },
   "author": "Disezmike",
   "license": "MIT",
