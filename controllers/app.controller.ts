@@ -149,6 +149,7 @@ async function handleEvent(events: line.webhook.Event[]) {
 
 		sql = 'INSERT INTO users(user_id) VALUE(?)';
 		[results, fields] = await conn.execute(sql, [user.userId]);
+		conn.end();
 	}
 
 	return;

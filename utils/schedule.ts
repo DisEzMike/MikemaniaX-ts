@@ -138,5 +138,7 @@ export const sendSchedule = async () => {
 				console.log(e.response.data);
 			}
 		});
+
+		conn.end();
 	});
 };
