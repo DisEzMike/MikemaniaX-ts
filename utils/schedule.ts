@@ -33,7 +33,7 @@ export const sendSchedule = async () => {
 							messages: [
 								{
 									type: 'flex',
-									altText: 'this is flex message',
+									altText: 'บิลมาแล้วจ้า',
 									contents: {
 										type: 'bubble',
 										body: {
