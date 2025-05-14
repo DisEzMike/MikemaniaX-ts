@@ -58,6 +58,7 @@ async function handleEvent(events: line.webhook.Event[]) {
 
 					connection = await Connect();
 					[rows] = await connection.execute(`SELECT user_id FROM users WHERE id=?`, [user_id]);
+					connection.end();
 					const user = (rows as any)[0];
 
 					await pushMessage(config.channelAccessToken!, {
@@ -79,6 +80,7 @@ async function handleEvent(events: line.webhook.Event[]) {
 
 					connection = await Connect();
 					[rows] = await connection.execute(`SELECT id FROM users WHERE user_id=?`, [event.source!.userId]);
+					connection.end();
 					const user = (rows as any)[0];
 
 					await pushMessage(config.channelAccessToken!, {
