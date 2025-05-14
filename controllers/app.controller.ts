@@ -1,3 +1,4 @@
+import mysql from 'mysql2/promise';
 import { RequestHandler } from 'express';
 import * as line from '@line/bot-sdk';
 import { pushMessage, replyMessage } from '../utils/line';
@@ -7,7 +8,7 @@ import axios from 'axios';
 
 import dotenv from 'dotenv';
 import { config } from '../utils/config';
-import { Connect } from '../utils/mysql';
+import { params } from '../utils/mysql';
 dotenv.config();
 
 const host = process.env.HOST;
@@ -49,13 +50,14 @@ async function handleEvent(events: line.webhook.Event[]) {
 					let user_id = cmd[1];
 					const text = cmd.slice(2).join(" ");
 
-					const connection = await Connect();
+					const connection = await mysql.createConnection(params);
 					let [rows] = await connection.execute("SELECT user_id FROM users WHERE role=1");
 					const admin = (rows as any)[0]
 
 					if (event.source!.userId != admin.user_id) return;
 
 					[rows] = await connection.execute(`SELECT user_id FROM users WHERE id=?`, [user_id]);
+					connection.end();
 					const user = (rows as any)[0];
 
 					await pushMessage(config.channelAccessToken!, {
@@ -68,13 +70,14 @@ async function handleEvent(events: line.webhook.Event[]) {
 						]
 					});
 				} else {
-					const connection = await Connect();
+					const connection = await mysql.createConnection(params);
 					let [rows] = await connection.execute("SELECT user_id FROM users WHERE role=1");
 					const admin = (rows as any)[0];
 
 					if (event.source!.userId == admin.user_id) return;
 
 					[rows] = await connection.execute(`SELECT id FROM users WHERE user_id=?`, [event.source!.userId]);
+					connection.end();
 					const user = (rows as any)[0];
 
 					await pushMessage(config.channelAccessToken!, {
@@ -180,17 +183,17 @@ async function handleEvent(events: line.webhook.Event[]) {
 
 		if (!user?.userId) return;
 
-		const conn = await Connect();
+		const connection = await mysql.createConnection(params);
 		let sql = 'SELECT * FROM users WHERE user_id=?';
-		let [results, fields] = await conn.execute(sql, [user.userId]);
+		let [results, fields] = await connection.execute(sql, [user.userId]);
 
 		results = results as any[]
 
 		if (results.length == 1) return;
 
 		sql = 'INSERT INTO users(user_id) VALUE(?)';
-		[results, fields] = await conn.execute(sql, [user.userId]);
-		conn.end();
+		[results, fields] = await connection.execute(sql, [user.userId]);
+		connection.end();
 	}
 
 	return;
