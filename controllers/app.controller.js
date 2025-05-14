@@ -109,7 +109,6 @@ function handleEvent(events) {
                                 }
                             ]
                         });
-                        connection.end();
                     }
                     else {
                         const connection = yield (0, mysql_1.Connect)();
@@ -132,7 +131,6 @@ function handleEvent(events) {
                                 }
                             ]
                         });
-                        connection.end();
                     }
                 }
                 catch (error) {

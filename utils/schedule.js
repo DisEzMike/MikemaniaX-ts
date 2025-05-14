@@ -145,7 +145,6 @@ const fetchSchedulesAndSetJobs = () => __awaiter(void 0, void 0, void 0, functio
             });
         }));
     });
-    connection.end();
     console.log('Schedules updated.');
 });
 exports.fetchSchedulesAndSetJobs = fetchSchedulesAndSetJobs;
