@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import * as line from '@line/bot-sdk';
-import { replyMessage } from '../utils/line';
+import { pushMessage, replyMessage } from '../utils/line';
 import fs from 'fs';
 import { Jimp } from 'jimp';
 import axios from 'axios';
@@ -28,13 +28,13 @@ export const callbackFn: RequestHandler = (req, res) => {
 
 async function handleEvent(events: line.webhook.Event[]) {
 	const event = events[0];
-	console.log(event);
 
 	if (event.type === 'message') {
 		if (event.message.type === 'text') {
 			try {
-				const text = event.message.text;
-				if (text == 'จ่ายเงิน') {
+				
+				const cmd = event.message.text.split(" ");
+				if (cmd[0] == 'จ่ายเงิน') {
 					await replyMessage(config.channelAccessToken!, {
 						replyToken: event.replyToken!,
 						messages: [
@@ -44,6 +44,55 @@ async function handleEvent(events: line.webhook.Event[]) {
 								previewImageUrl: `${host}/api/qr.jpg`,
 							},
 						],
+					});
+				} else if (cmd[0] == "/reply") {
+					let user_id = cmd[1];
+					const text = cmd.slice(2).join(" ");
+
+					let connection = await Connect();
+					let [rows] = await connection.execute("SELECT user_id FROM users WHERE role=1");
+					connection.end();
+					const admin = (rows as any)[0]
+
+					if (event.source!.userId != admin.user_id) return;
+
+					connection = await Connect();
+					[rows] = await connection.execute(`SELECT user_id FROM users WHERE id=?`, [user_id]);
+					const user = (rows as any)[0];
+
+					await pushMessage(config.channelAccessToken!, {
+						to: user.user_id,
+						messages: [
+							{
+								type: "text",
+								text: text
+							}
+						]
+					});
+				} else {
+					let connection = await Connect();
+					let [rows] = await connection.execute("SELECT user_id FROM users WHERE role=1");
+					connection.end();
+					const admin = (rows as any)[0];
+
+					if (event.source!.userId == admin.user_id) return;
+
+					connection = await Connect();
+					[rows] = await connection.execute(`SELECT id FROM users WHERE user_id=?`, [event.source!.userId]);
+					const user = (rows as any)[0];
+
+					await pushMessage(config.channelAccessToken!, {
+						to: admin.user_id,
+						messages: [
+							{
+								type: "text",
+								text: `ID : ${user.id}`
+							},
+							{
+								type: "text",
+								text: cmd.join(" ")
+							}
+						]
 					});
 				}
 			} catch (error) {
@@ -76,13 +125,10 @@ async function handleEvent(events: line.webhook.Event[]) {
 					}
 					// __ Printing the decrypted value __ \\
 					data = value.result;
-					// console.log(value.result);
 					fs.unlinkSync(path);
 					return value.result;
 				};
 				qrCodeInstance.decode(image.bitmap);
-				console.log(data);
-				// await delay(100);
 				try {
 					const url = process.env.API_URL!;
 					const apiKey = process.env.API_KEY!;
@@ -100,7 +146,6 @@ async function handleEvent(events: line.webhook.Event[]) {
 					);
 					// Handle success slip
 					const slipData = res.data.data;
-					console.log(slipData);
 
 					await replyMessage(config.channelAccessToken!, {
 						replyToken: event.replyToken!,

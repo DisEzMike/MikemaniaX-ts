@@ -1,6 +1,7 @@
 import express from 'express';
 import { router } from './routes/app.routes';
-import { sendSchedule } from './utils/schedule';
+import { fetchSchedulesAndSetJobs } from './utils/schedule';
+import nodeCron from 'node-cron';
 import fs from 'fs'
 
 import dotenv from 'dotenv';
@@ -17,8 +18,11 @@ const path = __dirname + '/temp'
 const temp = fs.existsSync(path);
 if (!temp) fs.mkdirSync(path);
 
-// schedule
-sendSchedule();
+// Poll every 30 seconds for new/changed tasks
+nodeCron.schedule('*/30 * * * * *', fetchSchedulesAndSetJobs);
+
+// Initial fetch
+fetchSchedulesAndSetJobs();
 
 // listen on port
 const port = process.env.PORT || 8000;
