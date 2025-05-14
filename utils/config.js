@@ -22,7 +22,6 @@ const MYSQL = {
     user: MYSQL_USER,
     pass: MYSQL_PASS,
 };
-console.log(MYSQL);
 const SERVER_HOSTNAME = process.env.SERVER_HOSTNAME || 'localhost';
 const SERVER_PORT = process.env.SERVER_PORT || 1337;
 const SERVER = {

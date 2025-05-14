@@ -74,12 +74,11 @@ exports.callbackFn = callbackFn;
 function handleEvent(events) {
     return __awaiter(this, void 0, void 0, function* () {
         const event = events[0];
-        console.log(event);
         if (event.type === 'message') {
             if (event.message.type === 'text') {
                 try {
-                    const text = event.message.text;
-                    if (text == 'จ่ายเงิน') {
+                    const cmd = event.message.text.split(" ");
+                    if (cmd[0] == 'จ่ายเงิน') {
                         yield (0, line_1.replyMessage)(config_1.config.channelAccessToken, {
                             replyToken: event.replyToken,
                             messages: [
@@ -89,6 +88,52 @@ function handleEvent(events) {
                                     previewImageUrl: `${host}/api/qr.jpg`,
                                 },
                             ],
+                        });
+                    }
+                    else if (cmd[0] == "/reply") {
+                        let user_id = cmd[1];
+                        const text = cmd.slice(2).join(" ");
+                        let connection = yield (0, mysql_1.Connect)();
+                        let [rows] = yield connection.execute("SELECT user_id FROM users WHERE role=1");
+                        connection.end();
+                        const admin = rows[0];
+                        if (event.source.userId != admin.user_id)
+                            return;
+                        connection = yield (0, mysql_1.Connect)();
+                        [rows] = yield connection.execute(`SELECT user_id FROM users WHERE id=?`, [user_id]);
+                        const user = rows[0];
+                        yield (0, line_1.pushMessage)(config_1.config.channelAccessToken, {
+                            to: user.user_id,
+                            messages: [
+                                {
+                                    type: "text",
+                                    text: text
+                                }
+                            ]
+                        });
+                    }
+                    else {
+                        let connection = yield (0, mysql_1.Connect)();
+                        let [rows] = yield connection.execute("SELECT user_id FROM users WHERE role=1");
+                        connection.end();
+                        const admin = rows[0];
+                        if (event.source.userId == admin.user_id)
+                            return;
+                        connection = yield (0, mysql_1.Connect)();
+                        [rows] = yield connection.execute(`SELECT id FROM users WHERE user_id=?`, [event.source.userId]);
+                        const user = rows[0];
+                        yield (0, line_1.pushMessage)(config_1.config.channelAccessToken, {
+                            to: admin.user_id,
+                            messages: [
+                                {
+                                    type: "text",
+                                    text: `ID : ${user.id}`
+                                },
+                                {
+                                    type: "text",
+                                    text: cmd.join(" ")
+                                }
+                            ]
                         });
                     }
                 }
@@ -120,13 +165,10 @@ function handleEvent(events) {
                         }
                         // __ Printing the decrypted value __ \\
                         data = value.result;
-                        // console.log(value.result);
                         fs_1.default.unlinkSync(path);
                         return value.result;
                     };
                     qrCodeInstance.decode(image.bitmap);
-                    console.log(data);
-                    // await delay(100);
                     try {
                         const url = process.env.API_URL;
                         const apiKey = process.env.API_KEY;
@@ -140,7 +182,6 @@ function handleEvent(events) {
                         });
                         // Handle success slip
                         const slipData = res.data.data;
-                        console.log(slipData);
                         yield (0, line_1.replyMessage)(config_1.config.channelAccessToken, {
                             replyToken: event.replyToken,
                             messages: [
@@ -186,6 +227,7 @@ function handleEvent(events) {
                 return;
             sql = 'INSERT INTO users(user_id) VALUE(?)';
             [results, fields] = yield conn.execute(sql, [user.userId]);
+            conn.end();
         }
         return;
     });
