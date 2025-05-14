@@ -67,7 +67,6 @@ async function handleEvent(events: line.webhook.Event[]) {
 							}
 						]
 					});
-					connection.end();
 				} else {
 					const connection = await Connect();
 					let [rows] = await connection.execute("SELECT user_id FROM users WHERE role=1");
@@ -91,7 +90,6 @@ async function handleEvent(events: line.webhook.Event[]) {
 							}
 						]
 					});
-					connection.end();
 				}
 			} catch (error) {
 				console.error(error);

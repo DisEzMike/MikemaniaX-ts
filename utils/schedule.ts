@@ -150,6 +150,5 @@ export const fetchSchedulesAndSetJobs = async () => {
 	  });
 	});
   
-	connection.end();
 	console.log('Schedules updated.');
 }
