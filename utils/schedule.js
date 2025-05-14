@@ -36,7 +36,8 @@ const fetchSchedulesAndSetJobs = () => __awaiter(void 0, void 0, void 0, functio
             month: 'long',
             day: 'numeric',
         });
-        const cronExpr = `* * ${schedule.round} * *`;
+        // const cronExpr = `* * ${schedule.round} * *`;
+        const cronExpr = `*/5 * * * * *`;
         scheduledTasks[schedule.id] = node_cron_1.default.schedule(cronExpr, () => __awaiter(void 0, void 0, void 0, function* () {
             console.log(`Running task: ${schedule.id}`);
             yield (0, line_1.pushMessage)(config_1.config.channelAccessToken, {
