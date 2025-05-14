@@ -22,7 +22,6 @@ let scheduledTasks = {};
 const fetchSchedulesAndSetJobs = () => __awaiter(void 0, void 0, void 0, function* () {
     const connection = yield (0, mysql_1.Connect)();
     const [rows] = yield connection.execute('SELECT users.id, user_id, `title`, amount, `round` from users INNER JOIN groups ON users.group=groups.id where active=1');
-    connection.end();
     // Clear existing tasks
     for (let id in scheduledTasks) {
         scheduledTasks[id].stop();
@@ -146,6 +145,7 @@ const fetchSchedulesAndSetJobs = () => __awaiter(void 0, void 0, void 0, functio
             });
         }));
     });
+    connection.end();
     console.log('Schedules updated.');
 });
 exports.fetchSchedulesAndSetJobs = fetchSchedulesAndSetJobs;
