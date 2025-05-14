@@ -46,6 +46,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.callbackFn = void 0;
+const promise_1 = __importDefault(require("mysql2/promise"));
 const line = __importStar(require("@line/bot-sdk"));
 const line_1 = require("../utils/line");
 const fs_1 = __importDefault(require("fs"));
@@ -93,12 +94,13 @@ function handleEvent(events) {
                     else if (cmd[0] == "/reply") {
                         let user_id = cmd[1];
                         const text = cmd.slice(2).join(" ");
-                        const connection = yield (0, mysql_1.Connect)();
+                        const connection = yield promise_1.default.createConnection(mysql_1.params);
                         let [rows] = yield connection.execute("SELECT user_id FROM users WHERE role=1");
                         const admin = rows[0];
                         if (event.source.userId != admin.user_id)
                             return;
                         [rows] = yield connection.execute(`SELECT user_id FROM users WHERE id=?`, [user_id]);
+                        connection.end();
                         const user = rows[0];
                         yield (0, line_1.pushMessage)(config_1.config.channelAccessToken, {
                             to: user.user_id,
@@ -111,12 +113,13 @@ function handleEvent(events) {
                         });
                     }
                     else {
-                        const connection = yield (0, mysql_1.Connect)();
+                        const connection = yield promise_1.default.createConnection(mysql_1.params);
                         let [rows] = yield connection.execute("SELECT user_id FROM users WHERE role=1");
                         const admin = rows[0];
                         if (event.source.userId == admin.user_id)
                             return;
                         [rows] = yield connection.execute(`SELECT id FROM users WHERE user_id=?`, [event.source.userId]);
+                        connection.end();
                         const user = rows[0];
                         yield (0, line_1.pushMessage)(config_1.config.channelAccessToken, {
                             to: admin.user_id,
@@ -215,15 +218,15 @@ function handleEvent(events) {
             const user = event.source;
             if (!(user === null || user === void 0 ? void 0 : user.userId))
                 return;
-            const conn = yield (0, mysql_1.Connect)();
+            const connection = yield promise_1.default.createConnection(mysql_1.params);
             let sql = 'SELECT * FROM users WHERE user_id=?';
-            let [results, fields] = yield conn.execute(sql, [user.userId]);
+            let [results, fields] = yield connection.execute(sql, [user.userId]);
             results = results;
             if (results.length == 1)
                 return;
             sql = 'INSERT INTO users(user_id) VALUE(?)';
-            [results, fields] = yield conn.execute(sql, [user.userId]);
-            conn.end();
+            [results, fields] = yield connection.execute(sql, [user.userId]);
+            connection.end();
         }
         return;
     });

@@ -13,15 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchSchedulesAndSetJobs = void 0;
+const promise_1 = __importDefault(require("mysql2/promise"));
 // import schedule from 'node-schedule';
-const mysql_1 = require("./mysql");
 const node_cron_1 = __importDefault(require("node-cron"));
 const config_1 = require("./config");
 const line_1 = require("./line");
+const mysql_1 = require("./mysql");
 let scheduledTasks = {};
 const fetchSchedulesAndSetJobs = () => __awaiter(void 0, void 0, void 0, function* () {
-    const connection = yield (0, mysql_1.Connect)();
+    const connection = yield promise_1.default.createConnection(mysql_1.params);
     const [rows] = yield connection.execute('SELECT users.id, user_id, `title`, amount, `round` from users INNER JOIN groups ON users.group=groups.id where active=1');
+    connection.end();
     // Clear existing tasks
     for (let id in scheduledTasks) {
         scheduledTasks[id].stop();
