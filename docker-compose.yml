@@ -4,7 +4,7 @@ services:
   app:
     build: .
     env_file:
-      - .env
+      - stack.env
     ports:
       - "8000:8000"
     volumes:
