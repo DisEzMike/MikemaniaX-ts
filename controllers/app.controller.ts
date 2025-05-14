@@ -49,16 +49,13 @@ async function handleEvent(events: line.webhook.Event[]) {
 					let user_id = cmd[1];
 					const text = cmd.slice(2).join(" ");
 
-					let connection = await Connect();
+					const connection = await Connect();
 					let [rows] = await connection.execute("SELECT user_id FROM users WHERE role=1");
-					connection.end();
 					const admin = (rows as any)[0]
 
 					if (event.source!.userId != admin.user_id) return;
 
-					connection = await Connect();
 					[rows] = await connection.execute(`SELECT user_id FROM users WHERE id=?`, [user_id]);
-					connection.end();
 					const user = (rows as any)[0];
 
 					await pushMessage(config.channelAccessToken!, {
@@ -70,17 +67,15 @@ async function handleEvent(events: line.webhook.Event[]) {
 							}
 						]
 					});
-				} else {
-					let connection = await Connect();
-					let [rows] = await connection.execute("SELECT user_id FROM users WHERE role=1");
 					connection.end();
+				} else {
+					const connection = await Connect();
+					let [rows] = await connection.execute("SELECT user_id FROM users WHERE role=1");
 					const admin = (rows as any)[0];
 
 					if (event.source!.userId == admin.user_id) return;
 
-					connection = await Connect();
 					[rows] = await connection.execute(`SELECT id FROM users WHERE user_id=?`, [event.source!.userId]);
-					connection.end();
 					const user = (rows as any)[0];
 
 					await pushMessage(config.channelAccessToken!, {
@@ -96,6 +91,7 @@ async function handleEvent(events: line.webhook.Event[]) {
 							}
 						]
 					});
+					connection.end();
 				}
 			} catch (error) {
 				console.error(error);
