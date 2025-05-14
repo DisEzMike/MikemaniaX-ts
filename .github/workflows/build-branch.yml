@@ -1,0 +1,33 @@
+name: Build and Push to Build Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout main branch
+      uses: actions/checkout@v3
+
+    - name: Install dependencies and build
+      run: |
+        npm install
+        npm run build
+
+    - name: Push to build branch
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+
+        git clone --branch build https://github.com/${{ github.repository }} build-dir
+        rm -rf build-dir/*
+        cp -r build/* build-dir/
+
+        cd build-dir
+        git add .
+        git commit -m "Update build from main: ${{ github.sha }}"
+        git push
