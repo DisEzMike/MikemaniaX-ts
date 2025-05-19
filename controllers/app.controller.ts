@@ -57,7 +57,7 @@ async function handleEvent(events: line.webhook.Event[]) {
 					if (event.source!.userId != admin.user_id) return;
 
 					[rows] = await connection.execute(`SELECT user_id FROM users WHERE id=?`, [user_id]);
-					
+					connection.end();
 					const user = (rows as any)[0];
 
 					await pushMessage(config.channelAccessToken!, {
@@ -77,7 +77,7 @@ async function handleEvent(events: line.webhook.Event[]) {
 					if (event.source!.userId == admin.user_id) return;
 
 					[rows] = await connection.execute(`SELECT id FROM users WHERE user_id=?`, [event.source!.userId]);
-					
+					connection.end();
 					const user = (rows as any)[0];
 
 					await pushMessage(config.channelAccessToken!, {
@@ -193,7 +193,7 @@ async function handleEvent(events: line.webhook.Event[]) {
 
 		sql = 'INSERT INTO users(user_id) VALUE(?)';
 		[results, fields] = await connection.execute(sql, [user.userId]);
-		
+		connection.end();
 	}
 
 	return;

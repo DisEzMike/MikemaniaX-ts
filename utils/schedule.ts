@@ -22,7 +22,7 @@ let scheduledTasks:TASK = {}
 export const fetchSchedulesAndSetJobs = async () => {
 	const connection = await mysql.createConnection(params);
 	const [rows] = await connection.execute('SELECT users.id, user_id, `title`, amount, `round` from users INNER JOIN groups ON users.group=groups.id where active=1');
-	
+	connection.end();
 	// Clear existing tasks
 	for (let id in scheduledTasks) {
 	  scheduledTasks[id].stop();
@@ -38,8 +38,9 @@ export const fetchSchedulesAndSetJobs = async () => {
 			day: 'numeric',
 		})
 
-		const cronExpr = `0 38 ${schedule.round} * *`;
-		// const cronExpr = `*/10 * * * * *`;
+		// const cronExpr = `45 * ${schedule.round} * *`;
+		// console.log(cronExpr)
+		const cronExpr = `* * * * *`;
 
 		scheduledTasks[schedule.id] = nodeCron.schedule(cronExpr, async () => {
 		console.log(`Running task: ${schedule.id}`);
