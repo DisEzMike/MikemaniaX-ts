@@ -1,6 +1,6 @@
 import mysql from 'mysql2/promise';
-// import schedule from 'node-schedule';
-import nodeCron from 'node-cron';
+import schedule from 'node-schedule';
+// import nodeCron from 'node-cron';
 import { config } from './config';
 import { pushMessage } from './line';
 import { params } from './mysql';
@@ -30,7 +30,7 @@ export const fetchSchedulesAndSetJobs = async () => {
 	}
 
 	// Set new tasks
-	(rows as Value[]).forEach((schedule) => {
+	(rows as Value[]).forEach((task) => {
 		const now =  new Date();
 		const date = now.toLocaleDateString('th-TH', {
 			year: 'numeric',
@@ -42,11 +42,11 @@ export const fetchSchedulesAndSetJobs = async () => {
 		// console.log(cronExpr)
 		const cronExpr = `*/2 * * * *`;
 
-		scheduledTasks[schedule.id] = nodeCron.schedule(cronExpr, async () => {
-		console.log(`Running task: ${schedule.id}`);
+		scheduledTasks[task.id] = schedule.scheduleJob(cronExpr, async () => {
+		console.log(`Running task: ${task.id}`);
 		
 		await pushMessage(config.channelAccessToken!, {
-			to: schedule.user_id,
+			to: task.user_id,
 			messages: [
 				{
 					type: 'flex',
@@ -89,7 +89,7 @@ export const fetchSchedulesAndSetJobs = async () => {
 									contents: [
 										{
 											type: 'text',
-											text: `${schedule.title}`,
+											text: `${task.title}`,
 											flex: 2,
 											color: '#C7253E',
 										},
@@ -105,7 +105,7 @@ export const fetchSchedulesAndSetJobs = async () => {
 										},
 										{
 											type: 'text',
-											text: `฿${schedule.amount}`,
+											text: `฿${task.amount}`,
 											wrap: true,
 											color: '#009900',
 											size: 'xxl',
