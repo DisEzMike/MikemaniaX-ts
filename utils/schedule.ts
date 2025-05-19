@@ -38,8 +38,8 @@ export const fetchSchedulesAndSetJobs = async () => {
 			day: 'numeric',
 		})
 
-		// const cronExpr = `* * ${schedule.round} * *`;
-		const cronExpr = `*/10 * * * * *`;
+		const cronExpr = `0 38 ${schedule.round} * *`;
+		// const cronExpr = `*/10 * * * * *`;
 
 		scheduledTasks[schedule.id] = nodeCron.schedule(cronExpr, async () => {
 		console.log(`Running task: ${schedule.id}`);
