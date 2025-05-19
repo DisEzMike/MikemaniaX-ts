@@ -19,11 +19,11 @@ const path = __dirname + '/temp'
 const temp = fs.existsSync(path);
 if (!temp) fs.mkdirSync(path);
 
-// Poll every 30 seconds for new/changed tasks
-schedule.scheduleJob('*/30 * * * * *', fetchSchedulesAndSetJobs);
+// // Poll every 30 seconds for new/changed tasks
+// schedule.scheduleJob('*/30 * * * * *', fetchSchedulesAndSetJobs);
 
-// Initial fetch
-fetchSchedulesAndSetJobs();
+// // Initial fetch
+// fetchSchedulesAndSetJobs();
 
 // listen on port
 const port = process.env.PORT || 8000;

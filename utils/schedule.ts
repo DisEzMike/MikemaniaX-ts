@@ -9,7 +9,7 @@ interface TASK {
 	[propName: number]: schedule.Job;
 }
 
-interface Value {
+interface USER {
 	id: number;
 	user_id: string;
 	title: string;
@@ -30,7 +30,7 @@ export const fetchSchedulesAndSetJobs = async () => {
 	}
 
 	// Set new tasks
-	(rows as Value[]).forEach((task) => {
+	(rows as USER[]).forEach((task) => {
 		const now =  new Date();
 		const date = now.toLocaleDateString('th-TH', {
 			year: 'numeric',
