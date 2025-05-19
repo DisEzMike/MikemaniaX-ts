@@ -1,6 +1,6 @@
 import express from 'express';
 import { router } from './routes/app.routes';
-import { fetchSchedulesAndSetJobs } from './utils/schedule';
+import { fetchCurrencySchedules, fetchSchedulesAndSetJobs } from './utils/schedule';
 import schedule from 'node-schedule';
 // import nodeCron from 'node-cron';
 import fs from 'fs'
@@ -22,8 +22,8 @@ if (!temp) fs.mkdirSync(path);
 // // Poll every 30 seconds for new/changed tasks
 // schedule.scheduleJob('*/30 * * * * *', fetchSchedulesAndSetJobs);
 
-// // Initial fetch
-// fetchSchedulesAndSetJobs();
+// Initial fetch currency
+fetchCurrencySchedules();
 
 // listen on port
 const port = process.env.PORT || 8000;
