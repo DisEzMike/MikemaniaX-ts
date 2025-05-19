@@ -6,7 +6,7 @@ import { pushMessage } from './line';
 import { params } from './mysql';
 
 interface TASK {
-	[propName: number]: any;
+	[propName: number]: schedule.Job;
 }
 
 interface Value {
@@ -25,7 +25,7 @@ export const fetchSchedulesAndSetJobs = async () => {
 	connection.end();
 	// Clear existing tasks
 	for (let id in scheduledTasks) {
-	  scheduledTasks[id].stop();
+	  scheduledTasks[id].cancel();
 	  delete scheduledTasks[id];
 	}
 
