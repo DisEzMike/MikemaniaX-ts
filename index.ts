@@ -19,8 +19,9 @@ const path = __dirname + '/temp'
 const temp = fs.existsSync(path);
 if (!temp) fs.mkdirSync(path);
 
-// // Poll every 30 seconds for new/changed tasks
+// Poll every 30 seconds for new/changed tasks
 // schedule.scheduleJob('*/30 * * * * *', fetchSchedulesAndSetJobs);
+schedule.scheduleJob('*/30 * * * * *', fetchCurrencySchedules);
 
 // Initial fetch currency
 fetchCurrencySchedules();
