@@ -32,21 +32,20 @@ async function handleEvent(events: line.webhook.Event[]) {
 
 	if (event.type === 'message') {
 		if (event.message.type === 'text') {
-			try {
-				
-				const cmd = event.message.text.split(" ");
-				if (cmd[0] == 'จ่ายเงิน') {
-					await replyMessage(config.channelAccessToken!, {
-						replyToken: event.replyToken!,
-						messages: [
-							{
-								type: 'image',
-								originalContentUrl: `${host}/api/qr.jpg`,
-								previewImageUrl: `${host}/api/qr.jpg`,
-							},
-						],
-					});
-				} else if (cmd[0] == "/reply") {
+			const cmd = event.message.text.split(" ");
+			if (cmd[0] == 'จ่ายเงิน') {
+				await replyMessage(config.channelAccessToken!, {
+					replyToken: event.replyToken!,
+					messages: [
+						{
+							type: 'image',
+							originalContentUrl: `${host}/api/qr.jpg`,
+							previewImageUrl: `${host}/api/qr.jpg`,
+						},
+					],
+				});
+			} else if (cmd[0] == "/reply") {
+				try {
 					let user_id = cmd[1];
 					const text = cmd.slice(2).join(" ");
 
@@ -69,7 +68,11 @@ async function handleEvent(events: line.webhook.Event[]) {
 							}
 						]
 					});
-				} else {
+				} catch (error) {
+					console.error(`Error : ${(error as Error).message}`);
+				}
+			} else {
+				try {
 					const connection = await mysql.createConnection(params);
 					let [rows] = await connection.execute("SELECT user_id FROM users WHERE role=1");
 					const admin = (rows as any)[0];
@@ -93,9 +96,9 @@ async function handleEvent(events: line.webhook.Event[]) {
 							}
 						]
 					});
+				} catch (error) {
+					console.error(`Error : ${(error as Error).message}`);
 				}
-			} catch (error) {
-				console.error(error);
 			}
 		}
 
@@ -172,10 +175,9 @@ async function handleEvent(events: line.webhook.Event[]) {
 
 						return;
 					}
-					console.log(err);
 				}
-			} catch (e) {
-				console.error(e);
+			} catch (error) {
+				console.error(`Error : ${(error as Error).message}`);
 			}
 		}
 	} else if (event.type === 'follow') {
@@ -183,18 +185,21 @@ async function handleEvent(events: line.webhook.Event[]) {
 
 		if (!user?.userId) return;
 
-		const connection = await mysql.createConnection(params);
-		let sql = 'SELECT * FROM users WHERE user_id=?';
-		let [results, fields] = await connection.execute(sql, [user.userId]);
+		try {
+			const connection = await mysql.createConnection(params);
+			let sql = 'SELECT * FROM users WHERE user_id=?';
+			let [results, fields] = await connection.execute(sql, [user.userId]);
 
-		results = results as any[]
+			results = results as any[]
 
-		if (results.length == 1) return;
+			if (results.length == 1) return;
 
-		sql = 'INSERT INTO users(user_id) VALUE(?)';
-		[results, fields] = await connection.execute(sql, [user.userId]);
-		connection.end();
+			sql = 'INSERT INTO users(user_id) VALUE(?)';
+			[results, fields] = await connection.execute(sql, [user.userId]);
+			connection.end();
+		} catch (error) {
+			console.error(`Error : ${(error as Error).message}`);
+		}
 	}
-
 	return;
 }

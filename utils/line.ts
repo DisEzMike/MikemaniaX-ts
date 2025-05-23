@@ -2,13 +2,22 @@ import { PushMessageRequest, ReplyMessageRequest } from "@line/bot-sdk/dist/mess
 import axios, { AxiosError } from "axios";
 
 export const replyMessage = async (CHANNEL_ACCESS_TOKEN: string, replyMessageRequest: ReplyMessageRequest) => {
-    const URL = "https://api.line.me/v2/bot/message/reply"
-    await axios.post(URL, replyMessageRequest, {
-        headers : {
-            Authorization: `Bearer ${CHANNEL_ACCESS_TOKEN}`,
-            "Content-Type": "application/json"
-        }
-    })
+    try {
+        const URL = "https://api.line.me/v2/bot/message/reply"
+        await axios.post(URL, replyMessageRequest, {
+            headers : {
+                Authorization: `Bearer ${CHANNEL_ACCESS_TOKEN}`,
+                "Content-Type": "application/json"
+            }
+        })   
+    } catch (error) {
+        console.error(`Error: ${(error as Error).message}`);
+            if ((error as AxiosError).status == 429) console.log(((error as AxiosError).response!.data as {message: string}).message);
+            else {
+                console.log("Retry in 10s...");
+                setTimeout(() => replyMessage(CHANNEL_ACCESS_TOKEN, replyMessageRequest), 10000);
+            }
+    }
 }
 
 export const pushMessage = async (CHANNEL_ACCESS_TOKEN: string, pushMessageRequest: PushMessageRequest) => {
