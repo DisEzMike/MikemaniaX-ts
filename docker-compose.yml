@@ -1,27 +1,24 @@
-version: '3.8'
-
 services:
-  app:
-    build: .
+  # client:
+  #   build: ./frontend
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - mikemaniax-cli:/data
+  #   working_dir: /data/frontend
+  
+  backend:
+    build: ./backend
     env_file:
       - stack.env
     ports:
-      - "8000:8000"
+      - "8080:${PORT}"
     volumes:
-      - .:/app
-    depends_on:
-      - db
-
-  db:
-    image: mysql:8
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_PASS}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-    ports:
-      - "${MYSQL_PORT}:3306"
-    volumes:
-      - db-data:/var/lib/mysql
+      - mikemaniax-api:/data
+    # working_dir: /data/backend
 
 volumes:
-  db-data:
+  # mikemaniax-cli:
+  mikemaniax-api:

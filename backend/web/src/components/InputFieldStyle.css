@@ -1,0 +1,10 @@
+/* .expandable-input {
+  height: 23px;
+  max-height: 207px;
+  transition: height 0.3s ease;
+  overflow: hidden;
+} */
+
+/* .expandable-input:not(:focus) {
+  height: 30px;
+} */
