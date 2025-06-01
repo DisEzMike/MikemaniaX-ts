@@ -14,7 +14,7 @@ services:
     env_file:
       - stack.env
     ports:
-      - "8080:${PORT}"
+      - "8888:${PORT}"
     volumes:
       - mikemaniax-api:/data
     # working_dir: /data/backend
