@@ -10,5 +10,7 @@ COPY . .
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
+RUN npm run build
+
 EXPOSE ${API_PORT}
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]
