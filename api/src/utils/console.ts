@@ -25,12 +25,11 @@ export const setServerConsole = (socket: Socket<DefaultEventsMap, DefaultEventsM
                     type = `\u001b[36m${method.toLocaleUpperCase()}\u001b[0m`
                 }
                 const message = `[${type}] ${arg.map(log => typeof log === 'object' ? JSON.stringify(log) : log).join(" ")}`;
-                const output = {id:v4(), message, timestamp: moment()};
                 originalConsole[method](message);
 
                 const log = new Log({message});
                 await log.save();
-                
+
                 socket.emit("log", log);
             } catch (error) {
                 console.error(error);
