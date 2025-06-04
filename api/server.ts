@@ -19,6 +19,7 @@ import { Message } from './src/models/chat';
 import { createServer } from 'vite';
 import { pushMessage } from './src/utils/line';
 import { v4 } from 'uuid';
+import moment from 'moment';
 dotenv.config();
 //   // Define Message Schema
 
@@ -54,7 +55,7 @@ Object.keys(originalConsole).forEach((method) => {
 			type = `\u001b[36m${method.toLocaleUpperCase()}\u001b[0m`
 		}
 		const message = `[${type}] ${arg.map(log => typeof log === 'object' ? JSON.stringify(log) : log).join(" ")}`;
-		const output = {id:v4(), message};
+		const output = {id:v4(), message, timestamp: moment()};
 		originalConsole[method](message);
 		io.emit("log", output);
 	};
