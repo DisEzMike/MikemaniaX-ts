@@ -84,7 +84,6 @@ const Dm = () => {
 
         socket.on("chat history", (arrMsg) => {
             temp = arrMsg;
-            console.log(temp)
             setMessage(temp);
             if (messagesEndRef.current) (messagesEndRef.current as HTMLDivElement).scrollIntoView({ behavior: "instant" });
         })
@@ -129,7 +128,7 @@ const Dm = () => {
                             justifyContent: "flex-end",
                             alignItems: "stretch",
                         }}>
-                            {skeletonMockData.map((message) => <Message message={message} user={user} sender={message.sender} loading />)}
+                            {skeletonMockData.map((message, i) => <Message key={i} message={message} user={user} sender={message.sender} loading />)}
                             
                         </Stack>
                     </Item>
