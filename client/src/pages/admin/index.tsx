@@ -1,11 +1,13 @@
 import {
   Box,
+  Container,
   List,
   ListItem,
   ListItemText,
   Paper,
   Stack,
   styled,
+  Typography,
 } from "@mui/material";
 import { API_URL } from "../../config/constant";
 import { useEffect, useState } from "react";
@@ -16,11 +18,12 @@ import moment from "moment";
 const Card = styled(Paper)(({ theme }) => ({
   backgroundColor: "#fff",
   ...theme.typography.body2,
-  padding: theme.spacing(1),
+  padding: theme.spacing(3),
   color: (theme.vars ?? theme).palette.text.secondary,
   ...theme.applyStyles?.("dark", {
     backgroundColor: "#1A2027",
   }),
+  overflowX: "hidden", 
 }));
 
 const Admin = () => {
@@ -50,33 +53,39 @@ const Admin = () => {
   }
 
   return (
-    <Box width="100%" height="100%">
+    <Container>
       <Stack gap={2}>
         <Card elevation={8} style={{ width: "100%" }}>
-          {loading ? (
-            <>Loading...</>
-          ) : (
-            <List
-                sx={{
-                    width: '100%',
-                    bgcolor: 'background.paper',
-                    position: 'relative',
-                    overflow: 'auto',
-                    height: 300,
-                    '& ul': { padding: 0 },
-                }}
-                subheader={<li />}
-            >
-              {messages.map((item, i) => (
-                <li key={i}>
-                    <pre dangerouslySetInnerHTML={{__html: `${moment(item.timestamp)} ${ansiConverter.toHtml(item.message)}`}} />
-                </li>
-              ))}
-            </List>
-          )}
+          
+        </Card>
+
+        <Card elevation={8} style={{ width: "100%" }}>
+          <Typography variant="h5">ประวัติการใช้งาน</Typography>
+          <List
+              sx={{
+                  bgcolor: '#eee',
+                  position: 'relative',
+                  overflow: 'auto',
+                  height: 300,
+                  paddingX: "20px",
+                  '& ul': { padding: 0 },
+              }}
+              subheader={<li />}
+          >
+            {loading
+            ? <li>
+                <pre>Loading...</pre>
+            </li>
+            :
+            messages.map((item, i) => (
+              <li key={i}>
+                  <pre dangerouslySetInnerHTML={{__html: `[${moment(item.timestamp).format("DD/MM/YYYY hh:mm:ss")}] ${ansiConverter.toHtml(item.message)}`}} />
+              </li>
+            ))}
+          </List>
         </Card>
       </Stack>
-    </Box>
+    </Container>
   );
 };
 
