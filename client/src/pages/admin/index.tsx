@@ -32,7 +32,7 @@ const Admin = () => {
     const socket: Socket = io(API_URL);
 
     socket.on("log", (msg: any) => {
-      setMessages((prev) => [...prev, msg]);
+      setMessages((prev) => [msg, ...prev]);
       setLoading(false);
     });
 
@@ -54,7 +54,7 @@ const Admin = () => {
                     bgcolor: 'background.paper',
                     position: 'relative',
                     overflow: 'auto',
-                    maxHeight: 300,
+                    height: 300,
                     '& ul': { padding: 0 },
                 }}
                 subheader={<li />}
