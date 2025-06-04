@@ -9,6 +9,10 @@ export default defineConfig({
     port: 3000,
     allowedHosts: true
   },
+  preview: {
+    port: 3000,
+    allowedHosts: true,
+  },
   build: {
     chunkSizeWarningLimit: 1600
   }
