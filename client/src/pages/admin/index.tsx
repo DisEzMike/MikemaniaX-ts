@@ -11,6 +11,7 @@ import { API_URL } from "../../config/constant";
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import AnsiToHtml from 'ansi-to-html';
+import moment from "moment";
 
 const Card = styled(Paper)(({ theme }) => ({
   backgroundColor: "#fff",
@@ -61,7 +62,7 @@ const Admin = () => {
             >
               {messages.map((item, i) => (
                 <li key={i}>
-                    <pre dangerouslySetInnerHTML={{__html: ansiConverter.toHtml(item.message)}} />
+                    <pre dangerouslySetInnerHTML={{__html: `${moment(item.timestamp)} ${ansiConverter.toHtml(item.message)}`}} />
                 </li>
               ))}
             </List>
