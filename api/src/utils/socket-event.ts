@@ -3,16 +3,17 @@ import { setServerConsole } from "./console";
 import { Message } from "../models/chat";
 import { pushMessage } from "./line";
 import { Log } from "../models/log";
+import moment from "moment";
 
 export const createSocketIO = (io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
     io.on('connection', (socket) => {
-        setServerConsole(socket);
 
         // LINE EVENT
         LINE_EVENT(socket);
 
         // LOG EVENT
-        LOG_EVENT(socket)
+        LOG_EVENT(socket);
+        setServerConsole(socket);
     });
 }
 
@@ -51,7 +52,8 @@ const LINE_EVENT = (socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEv
 
 const LOG_EVENT = (socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
     socket.on("log", async () => {
-        const logs = await Log.find({});
+        const thirtyDaysAgo = moment().subtract(30, 'days').toDate();
+        const logs = await Log.find({timestamp: {$gte: thirtyDaysAgo}}).sort({timestamp: -1});
         socket.emit("log-history", logs);
     })
 }

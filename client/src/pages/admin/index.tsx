@@ -30,17 +30,24 @@ const Admin = () => {
   const ansiConverter = new AnsiToHtml();
 
   useEffect(() => {
-    const socket: Socket = io(API_URL);
+    const socket = io(API_URL);
+    onLog(socket);
+  }, []);
+
+  const onLog = (socket: any) => {
+    socket.emit("log");
 
     socket.on("log", (msg: any) => {
+      console.log(msg)
       setMessages((prev) => [msg, ...prev]);
       setLoading(false);
     });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+    socket.on("log-history", (logs: any[]) => {
+      console.log(logs)
+      setMessages(logs)
+    })
+  }
 
   return (
     <Box width="100%" height="100%">
