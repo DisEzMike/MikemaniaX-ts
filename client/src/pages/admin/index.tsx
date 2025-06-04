@@ -1,9 +1,6 @@
 import {
-  Box,
   Container,
   List,
-  ListItem,
-  ListItemText,
   Paper,
   Stack,
   styled,
@@ -11,7 +8,7 @@ import {
 } from "@mui/material";
 import { API_URL } from "../../config/constant";
 import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import AnsiToHtml from 'ansi-to-html';
 import moment from "moment";
 
