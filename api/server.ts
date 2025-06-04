@@ -85,7 +85,7 @@ const startServer = async () => {
 	io.on('connection', (socket) => {
 		socket.on('join chat', async ({ room }) => {
 			socket.join(room);
-			console.log('User connected');
+			console.info('User connected');
 			// Load and send previous messages for that room
 			const messages = await Message.find({ room })
 				.select('-room')
@@ -95,7 +95,7 @@ const startServer = async () => {
 		});
 
 		socket.on('chat message', async ({ room, userId, message }) => {
-			console.log('User message');
+			console.info('User message');
 			const msg = new Message({ room, userId, message });
 			await msg.save();
 			io.to(room).emit('chat message', msg); // Only to users in the room
@@ -112,7 +112,7 @@ const startServer = async () => {
 		});
 
 		socket.on('disconnect', () => {
-			console.log('User disconnected');
+			console.info('User disconnected');
 		});
 	});
 
