@@ -21,3 +21,6 @@ frontend
 bk.env
 build
 dist
+test
+
+.DS_Store

@@ -1,0 +1,14 @@
+FROM node:24
+
+WORKDIR /data/client
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+EXPOSE ${CLIENT_PORT}
+CMD ["npm", "run", "dev"]

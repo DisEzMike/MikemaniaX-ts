@@ -1,24 +1,49 @@
 services:
-  # client:
-  #   build: ./frontend
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - mikemaniax-cli:/data
-  #   working_dir: /data/frontend
-  
-  backend:
-    build: ./backend
-    env_file:
-      - stack.env
-    ports:
-      - "8888:${PORT}"
+  init:
+    build:
+      context: .
+      dockerfile: init.Dockerfile
     volumes:
-      - mikemaniax-api:/data
-    # working_dir: /data/backend
+      - mikemaniax:/data
+    command: ["sh", "-c", "cp -r /src/client /data/ && cp -r /src/api /data/"]
+    # command: ["sh", "-c", "cp -r /src/client /data/"]
+    # command: ["sh", "-c", "cp -r /src/api /data/"]
+    depends_on: []
+    networks:
+      - maniax-network
+
+  client:
+    build: ./client
+    env_file:
+      - .env
+    ports:
+      - "5173:${CLIENT_PORT}"
+    volumes:
+      - mikemaniax:/data
+    working_dir: /data/client
+    depends_on:
+      - init
+    networks:
+      - maniax-network
+    command: sh -c "if [ ! -d node_modules ]; then npm install; fi && npm run dev"
+
+  api:
+    build: ./api
+    env_file:
+      - .env
+    ports:
+      - "8080:${API_PORT}"
+    volumes:
+      - mikemaniax:/data
+    working_dir: /data/api
+    depends_on:
+      - init
+    networks:
+      - maniax-network
+    command: sh -c "if [ ! -d node_modules ]; then npm install; fi && npm run dev"
 
 volumes:
-  # mikemaniax-cli:
-  mikemaniax-api:
+  mikemaniax:
+
+networks:
+  maniax-network:
