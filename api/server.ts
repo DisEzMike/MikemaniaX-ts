@@ -15,14 +15,9 @@ import dotenv from 'dotenv';
 import { middleware } from '@line/bot-sdk';
 import { LINE_CONFIG } from './src/utils/contant';
 import { callbackFn } from './src/controllers/app.controller';
-import { Message } from './src/models/chat';
 import { createServer } from 'vite';
-import { pushMessage } from './src/utils/line';
-import { v4 } from 'uuid';
-import moment from 'moment';
-import { setServerConsole } from './src/utils/console';
+import { createSocketIO } from './src/utils/socket-event';
 dotenv.config();
-//   // Define Message Schema
 
 const corsOptions: CorsOptions = {
 	origin: '*',
@@ -50,40 +45,7 @@ const startServer = async () => {
 	app.use('/api/callback', middleware(LINE_CONFIG), callbackFn);
 
 	// Socket.io connection
-	io.on('connection', (socket) => {
-		setServerConsole(socket);
-		socket.on('join chat', async ({ room }) => {
-			socket.join(room);
-			console.info('User connected');
-			// Load and send previous messages for that room
-			const messages = await Message.find({ room })
-				.select('-room')
-				.sort({ timestamp: 1 })
-				.limit(50);
-			socket.emit('chat history', messages);
-		});
-
-		socket.on('chat message', async ({ room, userId, message }) => {
-			console.info('User message');
-			const msg = new Message({ room, userId, message });
-			await msg.save();
-			io.to(room).emit('chat message', msg); // Only to users in the room
-
-			await pushMessage({
-				to: room,
-				messages: [
-					{
-						type: 'text',
-						text: message,
-					},
-				],
-			});
-		});
-
-		socket.on('disconnect', () => {
-			console.info('User disconnected');
-		});
-	});
+	createSocketIO(io);
 
 	app.use(cors(corsOptions));
 	app.use(bodyParse.json());
