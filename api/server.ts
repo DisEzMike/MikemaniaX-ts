@@ -18,6 +18,7 @@ import { callbackFn } from './src/controllers/app.controller';
 import { Message } from './src/models/chat';
 import { createServer } from 'vite';
 import { pushMessage } from './src/utils/line';
+import { v4 } from 'uuid';
 dotenv.config();
 //   // Define Message Schema
 
@@ -33,17 +34,50 @@ export const io = new Server(server, {
 	cors: corsOptions,
 });
 
-const originalLog = console.log;
+const originalConsole = {
+  log: console.log,
+  error: console.error,
+  warn: console.warn,
+  info: console.info,
+} as any;
 
-console.log = function (...arg) {
-	originalLog.apply(console, arg);
-	io.emit("log", arg.map(a => typeof a === 'object' ? JSON.stringify(a) : a).join(" "));
-};
+Object.keys(originalConsole).forEach((method) => {
+	(console as any)[method] = (...arg: string[]) => {
+		let type = method;
+		if (method == 'log') {
+			type = `\u001b[32m${method.toLocaleUpperCase()}\u001b[0m`
+		} else if (method == 'warn') {
+			type = `\u001b[33m${method.toLocaleUpperCase()}\u001b[0m`
+		} else if (method == 'error') {
+			type = `\u001b[31m${method.toLocaleUpperCase()}\u001b[0m`
+		} else {
+			type = `\u001b[36m${method.toLocaleUpperCase()}\u001b[0m`
+		}
+		const message = `[${type}] ${arg.map(log => typeof log === 'object' ? JSON.stringify(log) : log).join(" ")}`;
+		const output = {id:v4(), message};
+		originalConsole[method](message);
+		io.emit("log", output);
+	};
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
 
 const startServer = async () => {
 	await connectDB();
 
-	app.use(morgan('dev'));
+	app.use(morgan('dev', {
+		stream: {
+			write: (message) => {
+				console.log("[\u001b[33mHTTP\u001b[0m]", message.trim());
+			}
+		}
+	}));
 
 	app.use('/api/callback', middleware(LINE_CONFIG), callbackFn);
 
