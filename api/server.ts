@@ -20,6 +20,7 @@ import { createServer } from 'vite';
 import { pushMessage } from './src/utils/line';
 import { v4 } from 'uuid';
 import moment from 'moment';
+import { setServerConsole } from './src/utils/console';
 dotenv.config();
 //   // Define Message Schema
 
@@ -33,40 +34,6 @@ const app = express();
 const server = http.createServer(app);
 export const io = new Server(server, {
 	cors: corsOptions,
-});
-
-const originalConsole = {
-  log: console.log,
-  error: console.error,
-  warn: console.warn,
-  info: console.info,
-} as any;
-
-Object.keys(originalConsole).forEach((method) => {
-	(console as any)[method] = (...arg: string[]) => {
-		let type = method;
-		if (method == 'log') {
-			type = `\u001b[32m${method.toLocaleUpperCase()}\u001b[0m`
-		} else if (method == 'warn') {
-			type = `\u001b[33m${method.toLocaleUpperCase()}\u001b[0m`
-		} else if (method == 'error') {
-			type = `\u001b[31m${method.toLocaleUpperCase()}\u001b[0m`
-		} else {
-			type = `\u001b[36m${method.toLocaleUpperCase()}\u001b[0m`
-		}
-		const message = `[${type}] ${arg.map(log => typeof log === 'object' ? JSON.stringify(log) : log).join(" ")}`;
-		const output = {id:v4(), message, timestamp: moment()};
-		originalConsole[method](message);
-		io.emit("log", output);
-	};
-});
-
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
 const startServer = async () => {
@@ -84,6 +51,7 @@ const startServer = async () => {
 
 	// Socket.io connection
 	io.on('connection', (socket) => {
+		setServerConsole(socket);
 		socket.on('join chat', async ({ room }) => {
 			socket.join(room);
 			console.info('User connected');
