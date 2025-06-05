@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { API_URL } from "../../config/constant";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import socketIOClient from "socket.io-client";
 import AnsiToHtml from 'ansi-to-html';
 import moment from "moment";
 
@@ -30,7 +30,7 @@ const Admin = () => {
   const ansiConverter = new AnsiToHtml();
 
   useEffect(() => {
-    const socket = io(API_URL);
+    const socket = socketIOClient(API_URL);
     onLog(socket);
   }, []);
 
