@@ -1,5 +1,4 @@
-// export const API_URL = "http://localhost:8080";
-export const API_URL = "https://sandniax.mikenatcavon.com";
+export const API_URL = import.meta.env.MODE == "production" ? process.env.PROD_HOST : `http://localhost:${process.env.PORT}`;
 
 export type Message = {
     userId: string,
