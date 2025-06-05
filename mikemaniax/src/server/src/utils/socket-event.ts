@@ -4,6 +4,7 @@ import { Message } from "../models/chat";
 import { pushMessage } from "./line";
 import { Log } from "../models/log";
 import moment from "moment";
+import { Counter } from "../models/counter";
 
 export const createSocketIO = (io: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
     io.on('connection', (socket) => {
@@ -51,9 +52,10 @@ const LINE_EVENT = (socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEv
 }
 
 const LOG_EVENT = (socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>) => {
-    socket.on("log", async () => {
-        const thirtyDaysAgo = moment().subtract(30, 'days').toDate();
-        const logs = await Log.find({timestamp: {$gte: thirtyDaysAgo}}).sort({timestamp: -1});
-        socket.emit("log-history", logs);
+    socket.on("log", async ({from}) => {
+        const index = await Counter.findById("log");
+        const logs = await Log.find({seq: {$gte: index!.seq-from-100, $lte: index!.seq-from-1}}).sort({timestamp: -1});
+        if (from == 0) socket.emit("log-history", logs);
+        else socket.emit("log-history-range", logs)
     })
 }
