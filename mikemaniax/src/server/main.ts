@@ -1,4 +1,5 @@
-import express from 'express';
+import express from "express";
+import ViteExpress from "vite-express";
 import http from 'http';
 import { Server } from 'socket.io';
 import { router } from './src/routes/app.routes';
@@ -11,12 +12,11 @@ import bodyParse from 'body-parser';
 import fs from 'fs';
 import path from 'path';
 
-import dotenv from 'dotenv';
 import { middleware } from '@line/bot-sdk';
 import { LINE_CONFIG } from './src/utils/contant';
 import { callbackFn } from './src/controllers/app.controller';
-import { createServer } from 'vite';
 import { createSocketIO } from './src/utils/socket-event';
+import dotenv from 'dotenv';
 dotenv.config();
 
 const corsOptions: CorsOptions = {
@@ -26,8 +26,8 @@ const corsOptions: CorsOptions = {
 
 // Setup Express
 const app = express();
-const server = http.createServer(app);
-export const io = new Server(server, {
+const httpServer = http.createServer(app);
+export const io = new Server(httpServer, {
 	cors: corsOptions,
 });
 
@@ -50,24 +50,19 @@ const startServer = async () => {
 	app.use(cors(corsOptions));
 	app.use(bodyParse.json());
 	app.use('/api', router);
-	
-	app.use(express.static('public'));
 
-	const tempPath = __dirname + '/temp';
+	const tempPath = path.dirname("") + '/temp';
 	const temp = fs.existsSync(tempPath);
 	if (!temp) fs.mkdirSync(tempPath);
 
-	const vite = await createServer({
-		server: { middlewareMode: true, allowedHosts: true },
-		root: path.resolve(__dirname, '../client'),
-	});
-	app.use(vite.middlewares);
 
 	// listen on port
 	const port = process.env.PORT || 8080;
-	server.listen(port, () => {
-		console.log(`listening on ${port}`);
-	});
+	const server = httpServer.listen(port);
+
+  ViteExpress.bind(app, server, () => {
+    console.log("Listen on http://localhost:"+port);
+  });
 };
 
 startServer();

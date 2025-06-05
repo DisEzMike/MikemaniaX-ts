@@ -11,13 +11,13 @@ import { LINE_CONFIG } from '../utils/contant';
 import { User } from '../models/user';
 import { DefaultEventsMap, Server, Socket } from 'socket.io';
 import { Message } from '../models/chat';
-import { io } from '../../server';
+import { io } from '../../main';
 // import { config } from '../utils/config';
 // import { params } from '../utils/mysql';
 dotenv.config();
 
 const host = process.env.HOST;
-const qrCodeReader = require('qrcode-reader');
+// const qrCodeReader = require('qrcode-reader');
 const client = new line.messagingApi.MessagingApiClient({
 	channelAccessToken: LINE_CONFIG.channelAccessToken!,
 });
@@ -71,84 +71,84 @@ async function handleEvent(events: line.webhook.Event[]) {
 			}
 		}
 
-		if (event.message.type === 'image') {
-			try {
-				let url = `https://api-data.line.me/v2/bot/message/${event.message.id}/content`;
-				const path = __dirname + '/../temp/temp.jpg';
-				let writer = fs.createWriteStream(path);
-				const delay = (ms: number) =>
-					new Promise((resolve) => setTimeout(resolve, ms));
-				const resp = await axios.get(url, {
-					responseType: 'stream',
-					headers: {
-						Authorization: `Bearer ${LINE_CONFIG.channelAccessToken}`,
-					},
-				});
-				await resp.data.pipe(writer);
-				await delay(2500);
-				const buffer = fs.readFileSync(path);
-				const image = await Jimp.read(buffer);
-				const qrCodeInstance = new qrCodeReader();
-				var data = '';
-				qrCodeInstance.callback = function (err: any, value: any) {
-					if (err) {
-						console.error(err);
-					}
-					// __ Printing the decrypted value __ \\
-					data = value.result;
-					fs.unlinkSync(path);
-					return value.result;
-				};
-				qrCodeInstance.decode(image.bitmap);
-				try {
-					const url = process.env.API_URL!;
-					const apiKey = process.env.API_KEY!;
-					const res = await axios.post(
-						url,
-						{
-							data,
-							log: true,
-						},
-						{
-							headers: {
-								'x-authorization': apiKey,
-							},
-						}
-					);
-					// Handle success slip
-					const slipData = res.data.data;
+		// if (event.message.type === 'image') {
+		// 	try {
+		// 		let url = `https://api-data.line.me/v2/bot/message/${event.message.id}/content`;
+		// 		const path = __dirname + '/../temp/temp.jpg';
+		// 		let writer = fs.createWriteStream(path);
+		// 		const delay = (ms: number) =>
+		// 			new Promise((resolve) => setTimeout(resolve, ms));
+		// 		const resp = await axios.get(url, {
+		// 			responseType: 'stream',
+		// 			headers: {
+		// 				Authorization: `Bearer ${LINE_CONFIG.channelAccessToken}`,
+		// 			},
+		// 		});
+		// 		await resp.data.pipe(writer);
+		// 		await delay(2500);
+		// 		const buffer = fs.readFileSync(path);
+		// 		const image = await Jimp.read(buffer);
+		// 		const qrCodeInstance = new qrCodeReader();
+		// 		var data = '';
+		// 		qrCodeInstance.callback = function (err: any, value: any) {
+		// 			if (err) {
+		// 				console.error(err);
+		// 			}
+		// 			// __ Printing the decrypted value __ \\
+		// 			data = value.result;
+		// 			fs.unlinkSync(path);
+		// 			return value.result;
+		// 		};
+		// 		qrCodeInstance.decode(image.bitmap);
+		// 		try {
+		// 			const url = process.env.API_URL!;
+		// 			const apiKey = process.env.API_KEY!;
+		// 			const res = await axios.post(
+		// 				url,
+		// 				{
+		// 					data,
+		// 					log: true,
+		// 				},
+		// 				{
+		// 					headers: {
+		// 						'x-authorization': apiKey,
+		// 					},
+		// 				}
+		// 			);
+		// 			// Handle success slip
+		// 			const slipData = res.data.data;
 
-					await replyMessage({
-						replyToken: event.replyToken!,
-						messages: [
-							{
-								type: 'text',
-								text: 'ชำระเงินเสร็จสิ้น ✅',
-							},
-						],
-					});
-				} catch (err) {
-					// Handle invalid slip
-					if (axios.isAxiosError(err)) {
-						const errorData = (err as any).response.data;
+		// 			await replyMessage({
+		// 				replyToken: event.replyToken!,
+		// 				messages: [
+		// 					{
+		// 						type: 'text',
+		// 						text: 'ชำระเงินเสร็จสิ้น ✅',
+		// 					},
+		// 				],
+		// 			});
+		// 		} catch (err) {
+		// 			// Handle invalid slip
+		// 			if (axios.isAxiosError(err)) {
+		// 				const errorData = (err as any).response.data;
 
-						await replyMessage({
-							replyToken: event.replyToken!,
-							messages: [
-								{
-									type: 'text',
-									text: errorData.message,
-								},
-							],
-						});
+		// 				await replyMessage({
+		// 					replyToken: event.replyToken!,
+		// 					messages: [
+		// 						{
+		// 							type: 'text',
+		// 							text: errorData.message,
+		// 						},
+		// 					],
+		// 				});
 
-						return;
-					}
-				}
-			} catch (error) {
-				console.error(`Error : ${(error as Error).message}`);
-			}
-		}
+		// 				return;
+		// 			}
+		// 		}
+		// 	} catch (error) {
+		// 		console.error(`Error : ${(error as Error).message}`);
+		// 	}
+		// }
 	} else if (event.type === 'follow') {
 		const user = event.source;
 

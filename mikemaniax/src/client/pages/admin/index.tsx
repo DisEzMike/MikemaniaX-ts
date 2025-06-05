@@ -44,7 +44,6 @@ const Admin = () => {
     });
 
     socket.on("log-history", (logs: any[]) => {
-      console.log(logs)
       setMessages(logs)
     })
   }
