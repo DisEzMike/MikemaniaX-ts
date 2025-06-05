@@ -1,49 +1,13 @@
 services:
-  init:
-    build:
-      context: .
-      dockerfile: init.Dockerfile
-    volumes:
-      - mikemaniax:/data
-    command: ["sh", "-c", "cp -r /src/client /data/ && cp -r /src/api /data/"]
-    # command: ["sh", "-c", "cp -r /src/client /data/"]
-    # command: ["sh", "-c", "cp -r /src/api /data/"]
-    depends_on: []
-    networks:
-      - maniax-network
-
-  client:
-    build: ./client
+  mikemaniax:
+    build: ./mikemaniax
     env_file:
-      - .env
+      - "./mikemaniax/.env"
     ports:
-      - "3000:${CLIENT_PORT}"
+      - "8080:${PORT}"
     volumes:
-      - mikemaniax:/data
-    working_dir: /data/client
-    depends_on:
-      - init
-    networks:
-      - maniax-network
-    command: sh -c "if [ ! -d node_modules ]; then npm install; fi && npm run preview"
-
-  api:
-    build: ./api
-    env_file:
-      - .env
-    ports:
-      - "8080:${API_PORT}"
-    volumes:
-      - mikemaniax:/data
-    working_dir: /data/api
-    depends_on:
-      - init
-    networks:
-      - maniax-network
-    command: sh -c "if [ ! -d node_modules ]; then npm install; fi && npm start"
+      - mikemaniax:/app
+    working_dir: /app
 
 volumes:
   mikemaniax:
-
-networks:
-  maniax-network:
